@@ -15,6 +15,7 @@ from ckan.common import g, config, _
 
 import platform
 import humanize as hz
+import subprocess
 
 
 log = logging.getLogger(__name__)
@@ -60,3 +61,8 @@ def get_ckan_info():
             u'user': g.user,
             u'auth_user_obj': g.userobj}
     return status_show(context, data_dict={})
+
+
+def get_git_describe():
+    '''Return CKAN commit'''
+    return subprocess.check_output(["git", "describe"]).strip()
