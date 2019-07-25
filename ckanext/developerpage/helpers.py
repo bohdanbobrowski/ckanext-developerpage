@@ -66,10 +66,10 @@ def get_git_branch():
     '''Return git describe result'''
     branches = subprocess.check_output(["git", "branch"]).strip()
     branches = branches.split('\n')
-    for b in branches:
-        if b.find('* ') == 0:
-            branch = b
-    return branch
+    for branch in branches:
+        if branch.find('* ') == 0:
+            return branch
+    return ''
 
 def get_git_describe():
     '''Return git describe result'''
