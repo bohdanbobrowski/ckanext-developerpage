@@ -64,5 +64,9 @@ def get_ckan_info():
 
 
 def get_git_describe():
-    '''Return CKAN commit'''
+    '''Return git describe result'''
     return subprocess.check_output(["git", "describe"]).strip()
+
+def get_git_head():
+    '''Return last commit hash'''
+    return subprocess.check_output(["git", "rev", "-parse", "--verify", "HEAD"]).strip()

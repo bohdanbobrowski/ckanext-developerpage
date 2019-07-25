@@ -22,8 +22,12 @@
         </tr>
     {% endfor %}
         <tr>
-            <td>Repository commit:</td>
+            <td>Git describe:</td>
             <td>{{ h.get_git_describe() }}</td>
+        </tr>
+        <tr>
+            <td>Last commit:</td>
+            <td>{{ h.get_git_head() }}</td>
         </tr>
     </table>
     <br />
