@@ -62,6 +62,14 @@ def get_ckan_info():
             u'auth_user_obj': g.userobj}
     return status_show(context, data_dict={})
 
+def get_git_branch():
+    '''Return git describe result'''
+    branches = subprocess.check_output(["git", "branch"]).strip()
+    branches = branches.split('\n')
+    for b in branches:
+        if b.find('* ') == 0:
+            branch = b
+    return branch
 
 def get_git_describe():
     '''Return git describe result'''
@@ -69,4 +77,4 @@ def get_git_describe():
 
 def get_git_head():
     '''Return last commit hash'''
-    return subprocess.check_output(["git", "rev", "-parse", "--verify", "HEAD"]).strip()
+    return subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip()

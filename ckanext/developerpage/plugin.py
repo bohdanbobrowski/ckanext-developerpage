@@ -4,7 +4,8 @@ import ckan.lib.helpers as ckanhelpers
 import ckan.plugins.toolkit as toolkit
 
 from ckanext.developerpage import blueprint
-from ckanext.developerpage.helpers import get_host_info, get_ckan_info, get_git_describe, get_git_head
+from ckanext.developerpage.helpers import get_host_info, get_ckan_info, \
+    get_git_branch, get_git_describe, get_git_head
 
 
 def counter_helper():
@@ -28,6 +29,7 @@ class DeveloperpagePlugin(p.SingletonPlugin):
             'get_host_info' : get_host_info,
             'get_ckan_info' : get_ckan_info,
             'counter_helper' : counter_helper,
+            'get_git_branch' : get_git_branch,
             'get_git_describe' : get_git_describe,
             'get_git_head' : get_git_head,
         }
