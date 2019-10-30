@@ -10,8 +10,7 @@ import ckan.model as model
 from ckan.common import g, config, _
 import platform
 import humanize as hz
-import ctypes
-import struct
+from uptime import boottime
 
 log = logging.getLogger(__name__)
 
@@ -40,37 +39,10 @@ def load_average_5min():
         }
 
 def get_host_info():
-    intervals = (
-        ('weeks', 604800),  # 60 * 60 * 24 * 7
-        ('days', 86400),  # 60 * 60 * 24
-        ('hours', 3600),  # 60 * 60
-        ('minutes', 60),
-        ('seconds', 1),
-    )
-    def display_time(seconds, granularity=2):
-        result = []
-
-        for name, count in intervals:
-            value = seconds // count
-            if value:
-                seconds -= value * count
-                if value == 1:
-                    name = name.rstrip('s')
-                result.append("{} {}".format(value, name))
-        return ', '.join(result[:granularity])
-    def uptime():
-        libc = ctypes.CDLL('libc.so.6')
-        buf = ctypes.create_string_buffer(4096)  # generous buffer to hold
-        if libc.sysinfo(buf) != 0:
-            print('failed')
-            return -1
-
-        uptime = struct.unpack_from('@l', buf.raw)[0]
-        return display_time(uptime)
     python_platform = {
             'machine_architecture' : platform.machine(),
             'python_version' : platform.python_version(),
-            'uptime': uptime()
+            'uptime': boottime(),
     }
     memory = memory_info()
     load = load_average_5min()

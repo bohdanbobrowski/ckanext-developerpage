@@ -1,2 +1,3 @@
-psutil
-humanize
+humanize>=0.5.1
+psutil>=5.6.3
+uptime>=3.0.1
