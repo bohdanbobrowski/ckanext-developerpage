@@ -10,7 +10,8 @@ import ckan.model as model
 from ckan.common import g, config, _
 import platform
 import humanize as hz
-from uptime import boottime
+import os
+import platform
 
 log = logging.getLogger(__name__)
 
@@ -38,11 +39,28 @@ def load_average_5min():
             'load_average_5min' : '{:.2f}'.format(psutil.getloadavg()[1]),
         }
 
+def creation_date(path_to_file):
+    """
+    Try to get the date that a file was created, falling back to when it was
+    last modified if that isn't possible.
+    See http://stackoverflow.com/a/39501288/1709587 for explanation.
+    """
+    if platform.system() == 'Windows':
+        return os.path.getctime(path_to_file)
+    else:
+        stat = os.stat(path_to_file)
+        try:
+            return stat.st_birthtime
+        except AttributeError:
+            # We're probably on Linux. No easy way to get creation dates here,
+            # so we'll settle for when its content was last modified.
+            return stat.st_mtime
+
 def get_host_info():
     python_platform = {
             'machine_architecture' : platform.machine(),
             'python_version' : platform.python_version(),
-            'uptime': boottime(),
+            'uptime': datetime.utcfromtimestamp(creation_date('/srv/app/production.ini')).strftime('%Y-%m-%d %H:%M:%S'),
     }
     memory = memory_info()
     load = load_average_5min()
