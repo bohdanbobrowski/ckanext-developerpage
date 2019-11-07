@@ -12,6 +12,8 @@ import platform
 import humanize as hz
 import os
 import platform
+from pip._internal.operations import freeze
+
 
 log = logging.getLogger(__name__)
 
@@ -58,9 +60,11 @@ def creation_date(path_to_file):
 
 def get_host_info():
     python_platform = {
-            'machine_architecture' : platform.machine(),
-            'python_version' : platform.python_version(),
-            'uptime': datetime.utcfromtimestamp(creation_date('/srv/app/production.ini')).strftime('%Y-%m-%d %H:%M:%S'),
+            u'machine_architecture': platform.machine(),
+            u'python_version': platform.python_version(),
+            u'config_creation_date': datetime.utcfromtimestamp(creation_date('/srv/app/production.ini')).strftime(
+            '%Y-%m-%d %H:%M:%S %z'),
+            u'host_time_zone': os.environ["TZ"],
     }
     memory = memory_info()
     load = load_average_5min()
@@ -72,5 +76,20 @@ def get_ckan_info():
     context = {
             u'model': model,
             u'user': g.user,
-            u'auth_user_obj': g.userobj}
+            u'auth_user_obj': g.userobj,
+    }
     return status_show(context, data_dict={})
+
+def get_extensions_info():
+    extensions_info = {}
+    extensions = freeze.freeze()
+    for ex in extensions:
+        if ex.find("ckanext") > 0 and  ex.find("#egg=") > 0 and ex.find(".git@") > 0:
+            ex = ex.split('#egg=')
+            egg = ex[1]
+            repository = ex[0].split('.git@')[0] + ".git"
+            repository = repository.replace("-e ", "")
+            repository = repository.replace("git+", "")
+            commit = ex[0].split('.git@')[1]
+            extensions_info[egg] = [repository, commit]
+    return extensions_info
