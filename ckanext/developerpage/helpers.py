@@ -82,14 +82,14 @@ def get_ckan_info():
 
 def get_extensions_info():
     extensions_info = {}
-    extensions = freeze.freeze()
+    extensions = freeze.freeze(local_only=True)
     for ex in extensions:
-        if ex.find("ckanext") > 0 and  ex.find("#egg=") > 0 and ex.find(".git@") > 0:
+        if ex.find('ckanext') > 0 and  ex.find('#egg=') > 0 and ex.find('@') > 0:
             ex = ex.split('#egg=')
             egg = ex[1]
-            repository = ex[0].split('.git@')[0] + ".git"
-            repository = repository.replace("-e ", "")
-            repository = repository.replace("git+", "")
-            commit = ex[0].split('.git@')[1]
+            commit = ex[0].split('@')[-1]
+            repository = ex[0].split('.git@')[0]
+            for pattern in ['-e ', 'git+', '@'+commit]:
+                repository = repository.replace(pattern, '')
             extensions_info[egg] = [repository, commit]
     return extensions_info
