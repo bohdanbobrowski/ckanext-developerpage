@@ -12,7 +12,10 @@ import platform
 import humanize as hz
 import os
 import platform
-from pip._internal.operations import freeze
+try:
+    from pip._internal.operations import freeze
+except ImportError as error:
+    freeze = None
 
 
 log = logging.getLogger(__name__)
@@ -62,10 +65,13 @@ def get_host_info():
     python_platform = {
             u'machine_architecture': platform.machine(),
             u'python_version': platform.python_version(),
-            u'config_creation_date': datetime.utcfromtimestamp(creation_date('/srv/app/production.ini')).strftime(
-            '%Y-%m-%d %H:%M:%S %z'),
             u'host_time_zone': os.environ["TZ"],
     }
+    try:
+        python_platform[u'config_creation_date'] = datetime.utcfromtimestamp(creation_date('/srv/app/production.ini')).strftime(
+                '%Y-%m-%d %H:%M:%S %z')
+    except Exception as error:
+        python_platform[u'config_creation_date'] = error
     memory = memory_info()
     load = load_average_5min()
     python_platform.update(memory)
@@ -82,14 +88,15 @@ def get_ckan_info():
 
 def get_extensions_info():
     extensions_info = {}
-    extensions = freeze.freeze(local_only=True)
-    for ex in extensions:
-        if ex.find('ckanext') > 0 and  ex.find('#egg=') > 0 and ex.find('@') > 0:
-            ex = ex.split('#egg=')
-            egg = ex[1]
-            commit = ex[0].split('@')[-1]
-            repository = ex[0].split('.git@')[0]
-            for pattern in ['-e ', 'git+', '@'+commit]:
-                repository = repository.replace(pattern, '')
-            extensions_info[egg] = [repository, commit]
+    if freeze is not None:
+        extensions = freeze.freeze(local_only=True)
+        for ex in extensions:
+            if ex.find('ckanext') > 0 and  ex.find('#egg=') > 0 and ex.find('@') > 0:
+                ex = ex.split('#egg=')
+                egg = ex[1]
+                commit = ex[0].split('@')[-1]
+                repository = ex[0].split('.git@')[0]
+                for pattern in ['-e ', 'git+', '@'+commit]:
+                    repository = repository.replace(pattern, '')
+                extensions_info[egg] = [repository, commit]
     return extensions_info
