@@ -12,6 +12,7 @@ import platform
 import humanize as hz
 import os
 import platform
+from time import gmtime, strftime
 try:
     from pip._internal.operations import freeze
 except ImportError as error:
@@ -65,7 +66,7 @@ def get_host_info():
     python_platform = {
             u'machine_architecture': platform.machine(),
             u'python_version': platform.python_version(),
-            u'host_time_zone': os.environ["TZ"],
+            u'host_time_zone': strftime("%z", gmtime()),
     }
     try:
         python_platform[u'config_creation_date'] = datetime.utcfromtimestamp(creation_date('/srv/app/production.ini')).strftime(
