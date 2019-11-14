@@ -51,6 +51,8 @@ def creation_date(path_to_file):
     last modified if that isn't possible.
     See http://stackoverflow.com/a/39501288/1709587 for explanation.
     """
+    if not os.path.isfile(path_to_file):
+        return False
     if platform.system() == 'Windows':
         return os.path.getctime(path_to_file)
     else:
@@ -69,8 +71,12 @@ def get_host_info():
             u'host_time_zone': strftime("%z", gmtime()),
     }
     try:
-        python_platform[u'config_creation_date'] = datetime.utcfromtimestamp(creation_date('/srv/app/production.ini')).strftime(
-                '%Y-%m-%d %H:%M:%S %z')
+        if creation_date('/srv/app/production.ini'):
+            config_creation_date = creation_date('/srv/app/production.ini')
+        else:
+            config_creation_date = creation_date('/etc/ckan/production.ini')
+        python_platform[u'config_creation_date'] = datetime.utcfromtimestamp(config_creation_date)\
+            .strftime('%Y-%m-%d %H:%M:%S %z')
     except Exception as error:
         python_platform[u'config_creation_date'] = error
     memory = memory_info()
