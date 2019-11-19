@@ -70,15 +70,15 @@ def get_host_info():
             u'python_version': platform.python_version(),
             u'host_time_zone': strftime("%z", gmtime()),
     }
-    try:
-        if creation_date('/srv/app/production.ini'):
-            config_creation_date = creation_date('/srv/app/production.ini')
-        else:
-            config_creation_date = creation_date('/etc/ckan/production.ini')
+    if creation_date('/srv/app/production.ini'):
+        config_creation_date = creation_date('/srv/app/production.ini')
+    else:
+        config_creation_date = creation_date('/etc/ckan/production.ini')
+    if config_creation_date:
         python_platform[u'config_creation_date'] = datetime.utcfromtimestamp(config_creation_date)\
             .strftime('%Y-%m-%d %H:%M:%S %z')
-    except Exception as error:
-        python_platform[u'config_creation_date'] = error
+    else:
+        python_platform[u'config_creation_date'] = "-"
     memory = memory_info()
     load = load_average_5min()
     python_platform.update(memory)
