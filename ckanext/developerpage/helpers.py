@@ -17,6 +17,7 @@ try:
     from pip._internal.operations import freeze
 except ImportError as error:
     freeze = None
+import subprocess
 
 
 log = logging.getLogger(__name__)
@@ -107,3 +108,20 @@ def get_extensions_info():
                     repository = repository.replace(pattern, '')
                 extensions_info[egg] = [repository, commit]
     return extensions_info
+
+def get_git_branch():
+    '''Return git describe result'''
+    branches = subprocess.check_output(["git", "branch"]).strip()
+    branches = branches.split('\n')
+    for branch in branches:
+        if branch.find('* ') == 0:
+            return branch
+    return ''
+
+def get_git_describe():
+    '''Return git describe result'''
+    return subprocess.check_output(["git", "describe"]).strip()
+
+def get_git_head():
+    '''Return last commit hash'''
+    return subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip()
