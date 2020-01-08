@@ -111,17 +111,28 @@ def get_extensions_info():
 
 def get_git_branch():
     '''Return git describe result'''
-    branches = subprocess.check_output(["git", "branch"]).strip()
-    branches = branches.split('\n')
-    for branch in branches:
-        if branch.find('* ') == 0:
-            return branch
-    return ''
+    try:
+        branches = subprocess.check_output(["git", "branch"]).strip()
+        branches = branches.split('\n')
+        for branch in branches:
+            if branch.find('* ') == 0:
+                return branch
+    except Exception as e:
+        log.debug(e)
+        return ''
 
 def get_git_describe():
     '''Return git describe result'''
-    return subprocess.check_output(["git", "describe"]).strip()
+    try:
+        return subprocess.check_output(["git", "describe"]).strip()
+    except Exception as e:
+        log.debug(e)
+        return ''
 
 def get_git_head():
     '''Return last commit hash'''
-    return subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip()
+    try:
+        return subprocess.check_output(["git", "rev-parse", "--verify", "HEAD"]).strip()
+    except Exception as e:
+        log.debug(e)
+        return ''
